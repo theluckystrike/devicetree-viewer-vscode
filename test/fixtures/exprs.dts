@@ -1,0 +1,21 @@
+/dts-v1/;
+#define BASE 0x1000
+#define SIZE(n) ((n) * 0x100)
+#define FLAGS (1 << 3 | 2)
+
+/ {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	a: node@1000 {
+		reg = <BASE SIZE(4)>;
+		flags = <FLAGS (-1) ('A') (10 > 3 ? 7 : 9)>;
+		wide = /bits/ 64 <0x123456789abcdef0>;
+		small = /bits/ 8 <0x12 0x34>;
+		bytes = [01 02 0a ff];
+		str = "tab\there", "quote\"";
+		path = &a;
+		self = <&a>;
+		unknown = <SOME_HEADER_MACRO>;
+	};
+};

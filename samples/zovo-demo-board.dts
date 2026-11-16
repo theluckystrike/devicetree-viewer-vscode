@@ -1,0 +1,191 @@
+// SPDX-License-Identifier: MIT
+/*
+ * Zovo demo board: a small, made-up ARM board for trying the DeviceTree Viewer.
+ * One file, no includes, so it compiles to zovo-demo-board.dtb as it is.
+ * GPIO 5 is used by both the status LED and the fan regulator on purpose:
+ * the address and pin map flags it.
+ */
+/dts-v1/;
+
+#define GIC_SPI 0
+#define IRQ_TYPE_LEVEL_HIGH 4
+#define GPIO_ACTIVE_HIGH 0
+#define GPIO_ACTIVE_LOW 1
+
+/memreserve/ 0x80000000 0x10000;
+
+/ {
+	model = "Zovo Demo Board";
+	compatible = "zovo,demo-board", "zovo,demo-soc";
+	#address-cells = <1>;
+	#size-cells = <1>;
+	interrupt-parent = <&gic>;
+
+	aliases {
+		serial0 = &uart0;
+		i2c1 = &i2c1;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs = "console=ttyS0,115200 root=/dev/mmcblk0p2 rw";
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <0>;
+			enable-method = "psci";
+		};
+
+		cpu1: cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a53";
+			reg = <1>;
+			enable-method = "psci";
+		};
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x80000000 0x20000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		dsp_carveout: dsp@9f000000 {
+			reg = <0x9f000000 0x1000000>;
+			no-map;
+		};
+	};
+
+	osc24m: oscillator {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+		clock-output-names = "osc24m";
+	};
+
+	soc {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0x0 0x40000000 0x10000000>;
+
+		gic: interrupt-controller@1000 {
+			compatible = "arm,gic-400";
+			reg = <0x1000 0x1000>, <0x2000 0x2000>;
+			interrupt-controller;
+			#interrupt-cells = <3>;
+		};
+
+		gpio0: gpio@10000 {
+			compatible = "zovo,demo-gpio";
+			reg = <0x10000 0x100>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+			interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
+			gpio-line-names = "", "", "", "", "BUTTON", "LED_STATUS", "LED_ERROR";
+		};
+
+		pinctrl: pinctrl@11000 {
+			compatible = "zovo,demo-pinctrl";
+			reg = <0x11000 0x400>;
+
+			uart0_pins: uart0-pins {
+				pins = "PA0", "PA1";
+				function = "uart0";
+			};
+
+			i2c1_pins: i2c1-pins {
+				pins = "PB6", "PB7";
+				function = "i2c1";
+				bias-pull-up;
+			};
+		};
+
+		uart0: serial@20000 {
+			compatible = "ns16550a";
+			reg = <0x20000 0x100>;
+			interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&osc24m>;
+			reg-shift = <2>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&uart0_pins>;
+			status = "okay";
+		};
+
+		i2c1: i2c@21000 {
+			compatible = "zovo,demo-i2c";
+			reg = <0x21000 0x400>;
+			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&osc24m>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&i2c1_pins>;
+			status = "okay";
+
+			temp_sensor: temperature-sensor@48 {
+				compatible = "ti,tmp102";
+				reg = <0x48>;
+				interrupt-parent = <&gpio0>;
+				interrupts = <4 2>;
+			};
+
+			eeprom@50 {
+				compatible = "atmel,24c32";
+				reg = <0x50>;
+				pagesize = <32>;
+			};
+		};
+
+		spi0: spi@22000 {
+			compatible = "zovo,demo-spi";
+			reg = <0x22000 0x400>;
+			interrupts = <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+
+		watchdog@23000 {
+			compatible = "zovo,demo-wdt";
+			reg = <0x23000 0x40>;
+			timeout-sec = <30>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led-status {
+			label = "status";
+			gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		led-error {
+			label = "error";
+			gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	fan_reg: regulator-fan {
+		compatible = "regulator-fixed";
+		regulator-name = "fan-5v";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+};

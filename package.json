@@ -1,0 +1,352 @@
+{
+  "name": "zovo-devicetree-viewer",
+  "displayName": "DeviceTree Viewer, DTS & DTB",
+  "description": "Devicetree viewer for VS Code: open compiled .dtb and .dtbo files as readable DTS text and a node tree, and .dts, .dtsi and Zephyr .overlay files as a tree with labels, phandle references, reg ranges and interrupts decoded. Nothing else to install. Offline, no account.",
+  "version": "0.1.0",
+  "publisher": "zovo",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1B2B34",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theluckystrike/devicetree-viewer-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/theluckystrike/devicetree-viewer-vscode/issues"
+  },
+  "homepage": "https://github.com/theluckystrike/devicetree-viewer-vscode#readme",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Visualization",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "devicetree",
+    "device tree",
+    "dts",
+    "dtb",
+    "embedded linux"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onUri",
+    "onLanguage:dts",
+    "onLanguage:devicetree"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "dtViewer.dtb",
+        "displayName": "DeviceTree Viewer (DTB)",
+        "selector": [
+          {
+            "filenamePattern": "*.dtb"
+          },
+          {
+            "filenamePattern": "*.dtbo"
+          }
+        ],
+        "priority": "default"
+      },
+      {
+        "viewType": "dtViewer.dts",
+        "displayName": "DeviceTree Viewer (tree)",
+        "selector": [
+          {
+            "filenamePattern": "*.dts"
+          },
+          {
+            "filenamePattern": "*.dtsi"
+          },
+          {
+            "filenamePattern": "*.overlay"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "dtViewer.openWithViewer",
+        "title": "Open DeviceTree Viewer",
+        "category": "DeviceTree",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "dtViewer.openAsText",
+        "title": "Open as Text",
+        "category": "DeviceTree",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "dtViewer.openSample",
+        "title": "Open the Sample DTB",
+        "category": "DeviceTree"
+      },
+      {
+        "command": "dtViewer.openSampleDts",
+        "title": "Open the Sample DTS",
+        "category": "DeviceTree"
+      },
+      {
+        "command": "dtViewer.openWalkthrough",
+        "title": "Get Started",
+        "category": "DeviceTree"
+      },
+      {
+        "command": "dtViewer.moreViewers",
+        "title": "More free tools by Zovo",
+        "category": "DeviceTree"
+      },
+      {
+        "command": "dtViewer.supportDeveloper",
+        "title": "Support the developer",
+        "category": "DeviceTree"
+      },
+      {
+        "command": "dtViewer.diff",
+        "title": "Compare Two Device Trees (Pro)",
+        "category": "DeviceTree",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "dtViewer.export",
+        "title": "Export as DTS, JSON or YAML, or Compile to DTB (Pro)",
+        "category": "DeviceTree",
+        "icon": "$(export)"
+      },
+      {
+        "command": "dtViewer.addressMap",
+        "title": "Address and Pin Map (Pro)",
+        "category": "DeviceTree",
+        "icon": "$(table)"
+      },
+      {
+        "command": "dtViewer.zovoPro.diff",
+        "title": "Zovo Pro: Compare two device trees"
+      },
+      {
+        "command": "dtViewer.zovoPro.export",
+        "title": "Zovo Pro: Export and compile"
+      },
+      {
+        "command": "dtViewer.zovoPro.addressMap",
+        "title": "Zovo Pro: Address and pin map"
+      },
+      {
+        "command": "dtViewer.outlineReveal",
+        "title": "Go to Node",
+        "category": "DeviceTree"
+      },
+      {
+        "command": "dtViewer.getPro",
+        "title": "Get Zovo Pro (USD 19 once, all Zovo extensions)",
+        "category": "Zovo Pro"
+      },
+      {
+        "command": "dtViewer.payWithPayPal",
+        "title": "Pay for Zovo Pro with PayPal (USD 19, team of 5 USD 59)",
+        "category": "Zovo Pro"
+      },
+      {
+        "command": "dtViewer.unlockWithSponsors",
+        "title": "I already paid: unlock with GitHub Sponsors",
+        "category": "Zovo Pro"
+      },
+      {
+        "command": "dtViewer.enterLicenseKey",
+        "title": "Enter Zovo Pro license key",
+        "category": "Zovo Pro"
+      },
+      {
+        "command": "dtViewer.removeLicense",
+        "title": "Remove Zovo Pro from this editor",
+        "category": "Zovo Pro"
+      },
+      {
+        "command": "dtViewer.payByCard",
+        "title": "Pay for Zovo Pro by card (USD 19)",
+        "category": "Zovo Pro"
+      },
+      {
+        "command": "dtViewer.enterKey",
+        "title": "Enter a key",
+        "category": "Zovo Pro"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "dtViewer.openAsText",
+          "when": "(activeCustomEditorId == 'dtViewer.dtb' || activeCustomEditorId == 'dtViewer.dts')",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dtViewer.openWithViewer",
+          "when": "resourceFilename =~ /\\.(dts|dtsi|overlay)$/i && activeEditor == workbench.editors.files.textFileEditor",
+          "group": "navigation@9"
+        },
+        {
+          "command": "dtViewer.diff",
+          "when": "(activeCustomEditorId == 'dtViewer.dtb' || activeCustomEditorId == 'dtViewer.dts') && config.dtViewer.showProTools",
+          "group": "1_dt@1"
+        },
+        {
+          "command": "dtViewer.export",
+          "when": "(activeCustomEditorId == 'dtViewer.dtb' || activeCustomEditorId == 'dtViewer.dts') && config.dtViewer.showProTools",
+          "group": "1_dt@2"
+        },
+        {
+          "command": "dtViewer.addressMap",
+          "when": "(activeCustomEditorId == 'dtViewer.dtb' || activeCustomEditorId == 'dtViewer.dts') && config.dtViewer.showProTools",
+          "group": "1_dt@3"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "dtViewer.openWithViewer",
+          "when": "resourceFilename =~ /\\.(dtb|dtbo|dts|dtsi|overlay)$/i && !explorerResourceIsFolder",
+          "group": "navigation@9"
+        },
+        {
+          "command": "dtViewer.zovoPro.diff",
+          "when": "resourceFilename =~ /\\.(dtb|dtbo|dts|dtsi|overlay)$/i && !explorerResourceIsFolder && config.dtViewer.showProTools",
+          "group": "zovoPro@1"
+        },
+        {
+          "command": "dtViewer.zovoPro.export",
+          "when": "resourceFilename =~ /\\.(dtb|dtbo|dts|dtsi|overlay)$/i && !explorerResourceIsFolder && config.dtViewer.showProTools",
+          "group": "zovoPro@2"
+        },
+        {
+          "command": "dtViewer.zovoPro.addressMap",
+          "when": "resourceFilename =~ /\\.(dtb|dtbo|dts|dtsi|overlay)$/i && !explorerResourceIsFolder && config.dtViewer.showProTools",
+          "group": "zovoPro@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "dtViewer.diff",
+          "when": "config.dtViewer.showProTools"
+        },
+        {
+          "command": "dtViewer.export",
+          "when": "config.dtViewer.showProTools"
+        },
+        {
+          "command": "dtViewer.addressMap",
+          "when": "config.dtViewer.showProTools"
+        },
+        {
+          "command": "dtViewer.zovoPro.diff",
+          "when": "false"
+        },
+        {
+          "command": "dtViewer.zovoPro.export",
+          "when": "false"
+        },
+        {
+          "command": "dtViewer.zovoPro.addressMap",
+          "when": "false"
+        },
+        {
+          "command": "dtViewer.outlineReveal",
+          "when": "false"
+        },
+        {
+          "command": "dtViewer.openAsText",
+          "when": "(activeCustomEditorId == 'dtViewer.dtb' || activeCustomEditorId == 'dtViewer.dts')"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "dtViewer.outline",
+          "name": "DeviceTree",
+          "when": "dtViewer.outlineShown"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "DeviceTree Viewer",
+      "properties": {
+        "dtViewer.showProTools": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Zovo Pro tools (compare, export and compile, address and pin map) in the Command Palette, the Explorer menu and the viewer toolbar. Everything free stays visible."
+        },
+        "dtViewer.askForRating": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask once for a Marketplace rating after device trees opened without an error on two occasions at least 30 minutes apart. \"Later\" asks one more time after 7 days, \"No thanks\" never asks again. Nothing is sent anywhere."
+        },
+        "dtViewer.showSupportLinks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the small Rate, More free tools and Zovo Pro links at the bottom of the viewer. Nothing is sent anywhere."
+        }
+      }
+    },
+    "walkthroughs": [
+      {
+        "id": "dtViewer.start",
+        "title": "Get started with the DeviceTree Viewer",
+        "description": "Read compiled device trees and device tree source as a tree in VS Code.",
+        "steps": [
+          {
+            "id": "open",
+            "title": "Open a .dtb or .dtbo file",
+            "description": "Click a compiled device tree. It opens as a node tree with every property decoded, the DTS text one click away, and the header facts on the right.\n[Open the sample DTB](command:dtViewer.openSample)",
+            "media": {
+              "image": "images/screenshot.png",
+              "altText": "A Raspberry Pi 4 device tree open in VS Code: the node tree, the properties of the GPIO controller with its reg range, and the file facts."
+            },
+            "completionEvents": [
+              "onCommand:dtViewer.openSample"
+            ]
+          },
+          {
+            "id": "source",
+            "title": "Device tree source and Zephyr overlays",
+            "description": "Right-click a .dts, .dtsi or .overlay file and pick Open DeviceTree Viewer. Once the extension runs, the DeviceTree view in the Explorer lists the nodes of the active file. Your text editor and language tools stay as they are.\n[Open the sample DTS](command:dtViewer.openSampleDts)",
+            "media": {
+              "markdown": "walkthrough/source.md"
+            },
+            "completionEvents": [
+              "onCommand:dtViewer.openSampleDts"
+            ]
+          },
+          {
+            "id": "zovo-related",
+            "title": "Tools that often go with device trees",
+            "description": "These free Zovo extensions open the other files of an embedded build. A link opens the extension page, and you choose there whether to install it.\n[ELF & PE Viewer](command:extension.open?%5B%22zovo.zovo-elf-pe-viewer%22%5D)\n[Intel HEX Viewer](command:extension.open?%5B%22zovo.zovo-intel-hex-viewer%22%5D)\n[Linker Map Viewer](command:extension.open?%5B%22zovo.zovo-linker-map-viewer%22%5D)",
+            "media": {
+              "markdown": "walkthrough/related.md"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "test": "node scripts/test.js",
+    "package": "npx -y @vscode/vsce@3 package --no-dependencies"
+  },
+  "devDependencies": {},
+  "sponsor": {
+    "url": "https://github.com/sponsors/theluckystrike/sponsorships?tier_id=679878"
+  }
+}
